@@ -6,6 +6,7 @@ server.use(express.json());
 let numberOfRequests = 0;
 const projects = [];
 
+//verificar se projeto existe
 function checkProjectExists(req, res, next) {
   const { id } = req.params;
   const project = projects.find(p => p.id == id);
@@ -17,6 +18,7 @@ function checkProjectExists(req, res, next) {
   return next();
 }
 
+//log de requisições
 function logRequests(req, res, next) {
   numberOfRequests++;
 
@@ -27,6 +29,7 @@ function logRequests(req, res, next) {
 
 server.use(logRequests);
 
+//criar projeto
 server.post('/projects', (req, res)=>{
   const { id, title } = req.body;
   const project = {
@@ -38,10 +41,22 @@ server.post('/projects', (req, res)=>{
   return res.json(projects);
 });
 
+//listar todos os projetos
 server.get('/projects', (req, res)=>{
   return res.json(projects);
 });
 
+//listar um projeto
+server.get('/projects/:id', checkProjectExists, (req, res)=>{
+  const { id } = req.params;
+  const { title } = req.body;
+
+  const project = projects.find(p => p.id == id);
+
+  return res.json(project);  
+});
+
+//alterar um projeto
 server.put('/projects/:id', checkProjectExists, (req, res)=>{
   const { id } = req.params;
   const { title } = req.body;
@@ -53,6 +68,7 @@ server.put('/projects/:id', checkProjectExists, (req, res)=>{
   return res.json(project);  
 });
 
+//apagar um projeto
 server.delete('/projects/:id', checkProjectExists, (req, res) => {
   const { id } = req.params;
 
@@ -63,6 +79,7 @@ server.delete('/projects/:id', checkProjectExists, (req, res) => {
   return res.send();
 });
 
+//adicionar uma tarefa a um projeto
 server.post('/projects/:id/tasks', checkProjectExists, (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
